@@ -5,6 +5,7 @@ import com.thinkslynk.fabric.annotations.generate.IGenerator
 import com.thinkslynk.fabric.annotations.generate.registry.RegisterBlockEntityGenerator
 import com.thinkslynk.fabric.annotations.generate.registry.RegisterBlockGenerator
 import com.thinkslynk.fabric.annotations.generate.registry.RegisterBlockItemGenerator
+import com.thinkslynk.fabric.annotations.generate.registry.RegisterItemGenerator
 import java.io.File
 import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
@@ -24,7 +25,8 @@ open class FabricProcessor: AbstractProcessor() {
         val generators: List<IGenerator> = listOf(
             RegisterBlockGenerator(),
             RegisterBlockItemGenerator(),
-            RegisterBlockEntityGenerator()
+            RegisterBlockEntityGenerator(),
+            RegisterItemGenerator()
         )
     }
 
