@@ -2,10 +2,7 @@ package com.thinkslynk.fabric.annotations
 
 import com.google.auto.service.AutoService
 import com.thinkslynk.fabric.annotations.generate.IGenerator
-import com.thinkslynk.fabric.annotations.generate.registry.RegisterBlockEntityGenerator
-import com.thinkslynk.fabric.annotations.generate.registry.RegisterBlockGenerator
-import com.thinkslynk.fabric.annotations.generate.registry.RegisterBlockItemGenerator
-import com.thinkslynk.fabric.annotations.generate.registry.RegisterItemGenerator
+import com.thinkslynk.fabric.annotations.generate.registry.*
 import java.io.File
 import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
@@ -23,10 +20,11 @@ open class FabricProcessor: AbstractProcessor() {
         const val GENERATED_PACKAGE = "com.thinkslynk.fabric.generated"
 
         val generators: List<IGenerator> = listOf(
-            RegisterBlockGenerator(),
-            RegisterBlockItemGenerator(),
-            RegisterBlockEntityGenerator(),
-            RegisterItemGenerator()
+                RegisterBlockGenerator(),
+                RegisterBlockItemGenerator(),
+                RegisterBlockEntityGenerator(),
+                RegisterItemGenerator(),
+                RegisterItemGroupGenerator()
         )
     }
 
