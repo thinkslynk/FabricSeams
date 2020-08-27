@@ -6,6 +6,7 @@ import com.thinkslynk.fabric.annotations.FabricProcessor
 import com.thinkslynk.fabric.annotations.extensions.*
 import com.thinkslynk.fabric.annotations.generate.IGenerator
 import com.thinkslynk.fabric.annotations.registry.RegisterBlockItem
+import com.thinkslynk.fabric.helpers.AnnotationHelpers
 import java.io.File
 import javax.lang.model.element.Element
 import kotlin.reflect.KClass
@@ -41,6 +42,7 @@ class RegisterBlockItemGenerator: IGenerator {
             .addImport("net.minecraft.item", "BlockItem")
             .addImport("net.minecraft.item", "Item")
             .addImport("net.minecraft.item", "ItemGroup")
+            .addImport(FabricProcessor.GENERATED_PACKAGE, RegisterItemGroupGenerator.CLASS_NAME)
             .addTypes(classes.asList())
             .build()
 
@@ -50,7 +52,13 @@ class RegisterBlockItemGenerator: IGenerator {
                 element ->
                 val annotation = element.getAnnotation(RegisterBlockItem::class.java)
                 val prop = RegisterBlockGenerator.formatPropertyName(element.simpleName.toString())
-                "BlockItem(BlockRegistryGenerated.$prop, Item.Settings().group(ItemGroup.${annotation.itemGroup}))"
+                val group = if (AnnotationHelpers.ItemGroup.contains(annotation.itemGroup)) {
+                    "ItemGroup.${annotation.itemGroup}"
+                } else {
+                    "${RegisterItemGroupGenerator.CLASS_NAME}.${annotation.itemGroup}"
+                }
+
+                "BlockItem(BlockRegistryGenerated.$prop, Item.Settings().group(${group}))"
             }, bestGuess("net.minecraft.item.BlockItem"))
             .addFunctions(functions.asList())
             .build()

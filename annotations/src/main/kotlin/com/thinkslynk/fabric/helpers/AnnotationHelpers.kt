@@ -19,5 +19,15 @@ object AnnotationHelpers {
         const val MATERIALS = "MATERIALS"
         const val HOTBAR = "HOTBAR"
         const val INVENTORY = "INVENTORY"
+
+        private val values = setOf(
+                BUILDING_BLOCKS, DECORATIONS, REDSTONE, TRANSPORTATION,
+                MISC, SEARCH, FOOD, TOOLS, COMBAT, BREWING, MATERIALS,
+                HOTBAR, INVENTORY
+        )
+
+        fun contains(group: String): Boolean {
+            return values.contains(group)
+        }
     }
 }
