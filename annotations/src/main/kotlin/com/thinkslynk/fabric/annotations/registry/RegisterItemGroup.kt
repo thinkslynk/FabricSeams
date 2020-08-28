@@ -1,5 +1,5 @@
 package com.thinkslynk.fabric.annotations.registry
 
 @Retention(AnnotationRetention.SOURCE)
-@Target(AnnotationTarget.CLASS)
+@Target(AnnotationTarget.FUNCTION)
 annotation class RegisterItemGroup

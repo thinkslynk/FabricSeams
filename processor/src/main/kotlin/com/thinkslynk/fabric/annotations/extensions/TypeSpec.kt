@@ -2,6 +2,8 @@ package com.thinkslynk.fabric.annotations.extensions
 
 import com.squareup.kotlinpoet.*
 import javax.lang.model.element.Element
+import javax.lang.model.element.ElementKind
+import javax.lang.model.element.ExecutableElement
 
 fun TypeSpec.Builder.addDefaultProperties(
     elements: Collection<Element>,
@@ -9,14 +11,25 @@ fun TypeSpec.Builder.addDefaultProperties(
 ): TypeSpec.Builder {
     var b = this
     elements.forEach {
+
         val targetClassName = it.simpleName.toString()
         val propName = formatName(targetClassName)
+        if (it.kind == ElementKind.METHOD) {
+            val methodElement = it as ExecutableElement
+            val returnType = methodElement.returnType
 
-        b = b.addProperty(
-            PropertySpec.builder(propName, it.asType().asTypeName(), KModifier.PUBLIC)
-                .initializer("$targetClassName()")
-                .build()
-        )
+            b = b.addProperty(
+                    PropertySpec.builder(propName, returnType.asTypeName(), KModifier.PUBLIC)
+                            .initializer("$targetClassName()")
+                            .build()
+            )
+        } else {
+            b = b.addProperty(
+                    PropertySpec.builder(propName, it.asType().asTypeName(), KModifier.PUBLIC)
+                            .initializer("$targetClassName()")
+                            .build()
+            )
+        }
     }
 
     return b

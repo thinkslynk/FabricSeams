@@ -2,19 +2,20 @@ package com.thinkslynk.fabric.annotations.extensions
 
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
-import javax.lang.model.element.Element
-import javax.lang.model.element.QualifiedNameable
+import javax.lang.model.element.*
+
 
 fun FileSpec.Builder.addImports(elements: Collection<Element>): FileSpec.Builder {
     var b = this
     elements.forEach {
-        // Check what the annotation was attached to
-        val qualified = it as QualifiedNameable
-        val target = qualified.qualifiedName.toString()
-        val targetClassName = target.substringAfterLast(".")
-        val targetPackage = target.substringBeforeLast(".")
 
-        b = b.addImport(targetPackage, targetClassName)
+        var enclosing = it
+        while (enclosing.kind != ElementKind.PACKAGE) {
+            enclosing = enclosing.enclosingElement
+        }
+        val packageElement = enclosing as PackageElement
+
+        b = b.addImport(packageElement.toString(), it.simpleName.toString())
     }
     return b
 }
