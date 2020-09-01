@@ -3,7 +3,8 @@ package com.thinkslynk.fabric.annotations
 import com.google.auto.service.AutoService
 import com.thinkslynk.fabric.annotations.generate.IGenerator
 import com.thinkslynk.fabric.annotations.generate.registry.*
-import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
 import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.TypeElement
@@ -38,8 +39,8 @@ open class FabricProcessor: AbstractProcessor() {
         }
 
         // Prep folder
-        val file = File(generatedSourcesRoot)
-        file.mkdir()
+        val path = Path.of(generatedSourcesRoot)
+        Files.createDirectories(path)
 
         // TODO Find root package of mod
 
@@ -48,7 +49,7 @@ open class FabricProcessor: AbstractProcessor() {
         // Run our standard generators
         generators.forEach{
             val elements = roundEnv.getElementsAnnotatedWith(it.getSupportedAnnotationClass().java)
-            it.generate(elements, file)
+            it.generate(elements, path)
         }
 
         return true

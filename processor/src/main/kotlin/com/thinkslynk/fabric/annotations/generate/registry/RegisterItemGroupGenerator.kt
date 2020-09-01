@@ -9,6 +9,7 @@ import com.thinkslynk.fabric.annotations.registry.RegisterBlockItem
 import com.thinkslynk.fabric.annotations.registry.RegisterItem
 import com.thinkslynk.fabric.annotations.registry.RegisterItemGroup
 import java.io.File
+import java.nio.file.Path
 import javax.lang.model.element.Element
 import kotlin.reflect.KClass
 
@@ -21,7 +22,7 @@ class RegisterItemGroupGenerator: IGenerator {
         }
     }
 
-    override fun generate(elements: Collection<Element>, folder: File) {
+    override fun generate(elements: Collection<Element>, folder: Path) {
         if (elements.isEmpty()) return
 
         // Output file

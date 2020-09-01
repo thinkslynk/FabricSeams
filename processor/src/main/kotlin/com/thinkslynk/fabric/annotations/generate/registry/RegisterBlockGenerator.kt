@@ -9,6 +9,7 @@ import com.thinkslynk.fabric.annotations.extensions.camelToSnakeCase
 import com.thinkslynk.fabric.annotations.generate.IGenerator
 import com.thinkslynk.fabric.annotations.registry.RegisterBlock
 import java.io.File
+import java.nio.file.Path
 import javax.lang.model.element.Element
 import javax.lang.model.element.QualifiedNameable
 import kotlin.reflect.KClass
@@ -23,7 +24,7 @@ class RegisterBlockGenerator: IGenerator {
         }
     }
     
-    override fun generate(elements: Collection<Element>, folder: File) {
+    override fun generate(elements: Collection<Element>, folder: Path) {
         if (elements.isEmpty()) return
 
         // Output file
