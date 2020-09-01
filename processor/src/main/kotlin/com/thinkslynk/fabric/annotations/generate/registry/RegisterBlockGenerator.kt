@@ -6,15 +6,14 @@ import com.thinkslynk.fabric.annotations.extensions.addDefaultProperties
 import com.thinkslynk.fabric.annotations.extensions.addImports
 import com.thinkslynk.fabric.annotations.extensions.addTypes
 import com.thinkslynk.fabric.annotations.extensions.camelToSnakeCase
-import com.thinkslynk.fabric.annotations.generate.IGenerator
+import com.thinkslynk.fabric.annotations.find.registry.BlockFinder
+import com.thinkslynk.fabric.annotations.generate.Generator
 import com.thinkslynk.fabric.annotations.registry.RegisterBlock
-import java.io.File
 import java.nio.file.Path
 import javax.lang.model.element.Element
-import javax.lang.model.element.QualifiedNameable
 import kotlin.reflect.KClass
 
-class RegisterBlockGenerator: IGenerator {
+class RegisterBlockGenerator: Generator {
     companion object {
         const val CLASS_NAME = "BlockRegistryGenerated"
         const val FUNC_NAME = "register"
@@ -24,7 +23,8 @@ class RegisterBlockGenerator: IGenerator {
         }
     }
     
-    override fun generate(elements: Collection<Element>, folder: Path) {
+    override fun generate(folder: Path) {
+        val elements = BlockFinder.blocks
         if (elements.isEmpty()) return
 
         // Output file
@@ -71,7 +71,5 @@ class RegisterBlockGenerator: IGenerator {
         return funcBuilder.build()
     }
 
-    override fun getSupportedAnnotationClass(): KClass<out Annotation> {
-        return RegisterBlock::class
-    }
+    override val finders get() = listOf(BlockFinder)
 }

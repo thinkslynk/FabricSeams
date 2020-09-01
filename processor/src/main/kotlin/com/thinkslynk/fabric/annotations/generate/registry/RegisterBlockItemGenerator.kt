@@ -4,15 +4,15 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ClassName.Companion.bestGuess
 import com.thinkslynk.fabric.annotations.FabricProcessor
 import com.thinkslynk.fabric.annotations.extensions.*
-import com.thinkslynk.fabric.annotations.generate.IGenerator
+import com.thinkslynk.fabric.annotations.find.registry.BlockItemFinder
+import com.thinkslynk.fabric.annotations.generate.Generator
 import com.thinkslynk.fabric.annotations.registry.RegisterBlockItem
 import com.thinkslynk.fabric.helpers.AnnotationHelpers
-import java.io.File
 import java.nio.file.Path
 import javax.lang.model.element.Element
 import kotlin.reflect.KClass
 
-class RegisterBlockItemGenerator: IGenerator {
+class RegisterBlockItemGenerator: Generator {
     companion object {
         const val CLASS_NAME = "BlockItemRegistryGenerated"
         const val FUNC_NAME = "register"
@@ -22,7 +22,8 @@ class RegisterBlockItemGenerator: IGenerator {
         }
     }
 
-    override fun generate(elements: Collection<Element>, folder: Path) {
+    override fun generate(folder: Path) {
+        val elements = BlockItemFinder.blockItems
         if (elements.isEmpty()) return
 
         // Output file
@@ -84,7 +85,5 @@ class RegisterBlockItemGenerator: IGenerator {
         return funcBuilder.build()
     }
 
-    override fun getSupportedAnnotationClass(): KClass<out Annotation> {
-        return RegisterBlockItem::class
-    }
+    override val finders get() = listOf(BlockItemFinder)
 }
