@@ -12,43 +12,18 @@ import com.thinkslynk.fabric.annotations.registry.RegisterItem
 import java.nio.file.Path
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
+import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 import javax.tools.Diagnostic
 
-class RegisterItemGenerator: Generator {
+class RegisterItemGenerator: AbstractRegistryGenerator() {
     companion object {
         const val CLASS_NAME = "ItemRegistryGenerated"
         const val FUNC_NAME = "register"
     }
 
-    override fun generate(folder: Path, processingEnv: ProcessingEnvironment) {
-        val elements = ItemFinder.items
-        if (elements.isEmpty()) return
-
-        val builder = RegistryBuilder(FabricProcessor.GENERATED_PACKAGE, CLASS_NAME, FUNC_NAME)
-
-        for (element in elements) {
-            var found = false
-            for(constructor in element.findConstructors()){
-                val args:List<VariableElement> = constructor.parameters
-                if(args.isNotEmpty()) {
-                    if (args.all { ArgumentFinder.knows(it) }) {
-                        builder.addItem(element, args)
-                        found = true
-                    }
-                }else{
-                    builder.addItem(element)
-                    found = true
-                }
-            }
-            if(!found){
-                processingEnv.messager.printMessage(Diagnostic.Kind.ERROR,"No constructor available",element)
-            }
-        }
-
-        // Output file
-        builder.writeTo(folder)
-    }
+    override val typeElements: List<TypeElement>
+        get() = ItemFinder.items
 
     override val finders get() = listOf(ItemFinder, ArgumentFinder)
 }

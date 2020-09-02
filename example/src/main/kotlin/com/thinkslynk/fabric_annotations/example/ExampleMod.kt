@@ -1,7 +1,7 @@
 package com.thinkslynk.fabric_annotations.example
 
 import com.thinkslynk.fabric.generated.BlockRegistryGenerated
-import com.thinkslynk.fabric.generated.ItemRegistryGenerated
+import com.thinkslynk.fabric.generated.BlockItemRegistryGenerated
 import net.fabricmc.api.ModInitializer
 
 object ExampleMod: ModInitializer {
@@ -10,6 +10,6 @@ object ExampleMod: ModInitializer {
     override fun onInitialize() {
         println("Initializing example mod...")
         BlockRegistryGenerated.register()
-        ItemRegistryGenerated.register()
+        BlockItemRegistryGenerated.register()
     }
 }
