@@ -4,25 +4,25 @@ import com.squareup.kotlinpoet.*
 import com.thinkslynk.fabric.annotations.extensions.camelToSnakeCase
 import com.thinkslynk.fabric.annotations.extensions.crossFlatMap
 import com.thinkslynk.fabric.annotations.find.registry.ArgumentFinder
-import com.thinkslynk.fabric.annotations.registry.RegisterItem
 import java.nio.file.Path
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 
-class RegistryBuilder(packageName: String, className: String, val funcName: String) {
+class RegistryBuilder(packageName: String, className: String, val funcName: String, val registry: MemberName) {
+    constructor(packageName: String, className: String, funcName: String, registry: String) : this(
+        packageName,className,funcName, MemberName(registryClass,registry)
+    )
+
     private val fileBuilder = FileSpec.builder(packageName, className)
-        .addImport("net.minecraft.util", "Identifier")
-        .addImport("net.minecraft.util.registry", "Registry")
 
     private val objectBuilder = TypeSpec.objectBuilder(className)
 
     private val registerBuilder = FunSpec.builder(funcName)
         .addModifiers(KModifier.PUBLIC)
 
-    fun addItem(type: TypeElement, args: List<VariableElement>) {
+    fun addItem(type: TypeElement, args: List<VariableElement>, annotationNamespace:String, annotationName:String) {
         val constName = formatPropertyName(type.simpleName.toString())
         val className = type.asClassName()
-        val annotation = type.getAnnotation(RegisterItem::class.java)
         if (PRE) {
             // ONE_K_STORAGE_PART_ITEM
             args.crossFlatMap({
@@ -36,8 +36,8 @@ class RegistryBuilder(packageName: String, className: String, val funcName: Stri
                     registerBuilder,
                     name,
                     className,
-                    annotation.namespace,
-                    generateRegistryName(annotation.name, genArgs),
+                    annotationNamespace,
+                    generateRegistryName(annotationName, genArgs),
                     genArgs
                 )
 
@@ -56,8 +56,8 @@ class RegistryBuilder(packageName: String, className: String, val funcName: Stri
                     objRegister,
                     name,
                     className,
-                    annotation.namespace,
-                    generateRegistryName(annotation.name, genArgs),
+                    annotationNamespace,
+                    generateRegistryName(annotationName, genArgs),
                     genArgs
                 )
 
@@ -72,7 +72,7 @@ class RegistryBuilder(packageName: String, className: String, val funcName: Stri
         }
     }
 
-    fun addItem(type: TypeElement) {
+    fun addItem(type: TypeElement, annotationNamespace:String, annotationName:String) {
         val constName = formatPropertyName(type.simpleName.toString())
         val className = type.asClassName()
         objectBuilder
@@ -87,15 +87,15 @@ class RegistryBuilder(packageName: String, className: String, val funcName: Stri
                     )
                     .build()
             )
-        val annotation = type.getAnnotation(RegisterItem::class.java)
         registerBuilder
             .addStatement("""$constName = %T()""", className)
             .addStatement(
-                """%T.register(Registry.ITEM, %T(%S, %P), $constName)""",
+                """%T.register(%M, %T(%S, %P), $constName)""",
                 registryClass,
+                registry,
                 identifierClass,
-                annotation.namespace,
-                annotation.name
+                annotationNamespace,
+                annotationName
             )
     }
 

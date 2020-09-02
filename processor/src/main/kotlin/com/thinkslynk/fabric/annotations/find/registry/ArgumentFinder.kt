@@ -25,7 +25,6 @@ object ArgumentFinder : Finder {
         element as TypeElement
         val constants = element.enclosedElements.filter{it.kind == ElementKind.ENUM_CONSTANT}
         elements[element.asClassName()] = constants.map { it.simpleName.toString() }
-        processingEnv.messager.printMessage(Kind.WARNING, "enum: ${element.asClassName()} -> ${elements[element.asClassName()]}", element)
         return true
     }
 
