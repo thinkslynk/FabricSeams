@@ -12,6 +12,7 @@ import com.thinkslynk.fabric.annotations.find.registry.BlockEntityFinder
 import com.thinkslynk.fabric.annotations.generate.Generator
 import com.thinkslynk.fabric.annotations.registry.RegisterBlockEntity
 import java.nio.file.Path
+import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
 
 class RegisterBlockEntityGenerator: Generator {
@@ -24,7 +25,7 @@ class RegisterBlockEntityGenerator: Generator {
         }
     }
     
-    override fun generate(folder: Path) {
+    override fun generate(folder: Path, processingEnv: ProcessingEnvironment) {
         val elements = BlockEntityFinder.blockEntities
         if (elements.isEmpty()) return
 

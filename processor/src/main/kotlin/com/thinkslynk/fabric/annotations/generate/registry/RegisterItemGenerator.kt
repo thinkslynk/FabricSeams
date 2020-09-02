@@ -2,71 +2,53 @@ package com.thinkslynk.fabric.annotations.generate.registry
 
 import com.squareup.kotlinpoet.*
 import com.thinkslynk.fabric.annotations.FabricProcessor
+import com.thinkslynk.fabric.annotations.builder.RegistryBuilder
+import com.thinkslynk.fabric.annotations.builder.RegistryBuilder.Companion.formatPropertyName
 import com.thinkslynk.fabric.annotations.extensions.*
+import com.thinkslynk.fabric.annotations.find.registry.ArgumentFinder
 import com.thinkslynk.fabric.annotations.find.registry.ItemFinder
 import com.thinkslynk.fabric.annotations.generate.Generator
 import com.thinkslynk.fabric.annotations.registry.RegisterItem
 import java.nio.file.Path
+import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
-import kotlin.reflect.KClass
+import javax.lang.model.element.VariableElement
+import javax.tools.Diagnostic
 
 class RegisterItemGenerator: Generator {
     companion object {
         const val CLASS_NAME = "ItemRegistryGenerated"
         const val FUNC_NAME = "register"
-
-        fun formatPropertyName(name: String): String {
-            return name.camelToSnakeCase().toUpperCase()
-        }
     }
 
-    override fun generate(folder: Path) {
+    override fun generate(folder: Path, processingEnv: ProcessingEnvironment) {
         val elements = ItemFinder.items
         if (elements.isEmpty()) return
 
-        // Output file
-        generateRegistryFile(
-            elements,
-            generateRegistryClass(
-                elements,
-                generateRegisterFunction(
-                    elements
-                )
-            )
-        ).writeTo(folder)
-    }
+        val builder = RegistryBuilder(FabricProcessor.GENERATED_PACKAGE, CLASS_NAME, FUNC_NAME)
 
-    private fun generateRegistryFile(elements: Collection<Element>, vararg classes: TypeSpec): FileSpec =
-        FileSpec.builder(FabricProcessor.GENERATED_PACKAGE, CLASS_NAME)
-            .addImport("net.minecraft.util", "Identifier")
-            .addImport("net.minecraft.util.registry", "Registry")
-            .addImports(elements)
-            .addTypes(classes.asList())
-            .build()
-
-    private fun generateRegistryClass(elements: Collection<Element>, vararg functions: FunSpec): TypeSpec=
-        TypeSpec.objectBuilder(CLASS_NAME)
-            .addDefaultProperties(elements, ::formatPropertyName)
-            .addFunctions(functions.asList())
-            .build()
-
-    private fun generateRegisterFunction(elements: Collection<Element>): FunSpec {
-        var funcBuilder = FunSpec.builder(FUNC_NAME)
-            .addModifiers(KModifier.PUBLIC)
-
-        elements.forEach {
-            val annotation = it.getAnnotation(RegisterItem::class.java)
-            val propName = formatPropertyName(it.simpleName.toString())
-
-            funcBuilder = funcBuilder.addStatement(
-                "Registry.register(Registry.ITEM, " +
-                        "Identifier(\"${annotation.namespace}\", \"${annotation.name}\"), " +
-                        "$propName)"
-            )
+        for (element in elements) {
+            var found = false
+            for(constructor in element.findConstructors()){
+                val args:List<VariableElement> = constructor.parameters
+                if(args.isNotEmpty()) {
+                    if (args.all { ArgumentFinder.knows(it) }) {
+                        builder.addItem(element, args)
+                        found = true
+                    }
+                }else{
+                    builder.addItem(element)
+                    found = true
+                }
+            }
+            if(!found){
+                processingEnv.messager.printMessage(Diagnostic.Kind.ERROR,"No constructor available",element)
+            }
         }
 
-        return funcBuilder.build()
+        // Output file
+        builder.writeTo(folder)
     }
 
-    override val finders get() = listOf(ItemFinder)
+    override val finders get() = listOf(ItemFinder, ArgumentFinder)
 }

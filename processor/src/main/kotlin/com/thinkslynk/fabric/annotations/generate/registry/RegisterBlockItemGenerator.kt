@@ -9,8 +9,8 @@ import com.thinkslynk.fabric.annotations.generate.Generator
 import com.thinkslynk.fabric.annotations.registry.RegisterBlockItem
 import com.thinkslynk.fabric.helpers.AnnotationHelpers
 import java.nio.file.Path
+import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
-import kotlin.reflect.KClass
 
 class RegisterBlockItemGenerator: Generator {
     companion object {
@@ -22,7 +22,7 @@ class RegisterBlockItemGenerator: Generator {
         }
     }
 
-    override fun generate(folder: Path) {
+    override fun generate(folder: Path, processingEnv: ProcessingEnvironment) {
         val elements = BlockItemFinder.blockItems
         if (elements.isEmpty()) return
 

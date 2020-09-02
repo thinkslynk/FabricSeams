@@ -9,7 +9,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
-import javax.lang.model.element.Element
 import javax.lang.model.element.TypeElement
 import javax.tools.Diagnostic
 
@@ -82,7 +81,6 @@ open class FabricProcessor : AbstractProcessor() {
         // process finders
         for (finder in finders) {
             val elements = roundEnv.getElementsAnnotatedWith(finder.annotation.java)
-            processingEnv.messager.printMessage(Diagnostic.Kind.NOTE, "$finder: ${elements.joinToString()}")
             for(element in elements){
                 finder.accept(element, processingEnv)
             }
@@ -90,10 +88,8 @@ open class FabricProcessor : AbstractProcessor() {
 
         // process generators
         for(generator in generators){
-            processingEnv.messager.printMessage(Diagnostic.Kind.NOTE, "starting generator: $generator\n")
-            generator.generate(path)
+            generator.generate(path, processingEnv)
         }
-
         return true
     }
 

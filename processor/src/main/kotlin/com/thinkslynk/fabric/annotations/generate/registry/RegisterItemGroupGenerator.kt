@@ -5,10 +5,9 @@ import com.thinkslynk.fabric.annotations.FabricProcessor
 import com.thinkslynk.fabric.annotations.extensions.*
 import com.thinkslynk.fabric.annotations.find.registry.ItemGroupFinder
 import com.thinkslynk.fabric.annotations.generate.Generator
-import com.thinkslynk.fabric.annotations.registry.RegisterItemGroup
 import java.nio.file.Path
+import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
-import kotlin.reflect.KClass
 
 class RegisterItemGroupGenerator: Generator {
     companion object {
@@ -19,7 +18,7 @@ class RegisterItemGroupGenerator: Generator {
         }
     }
 
-    override fun generate(folder: Path) {
+    override fun generate(folder: Path, processingEnv: ProcessingEnvironment) {
         val elements = ItemGroupFinder.itemGroups
         if (elements.isEmpty()) return
 
