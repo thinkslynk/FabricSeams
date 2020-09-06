@@ -3,7 +3,7 @@ package com.thinkslynk.fabric.annotations.generate.registry
 import com.squareup.kotlinpoet.*
 import com.thinkslynk.fabric.annotations.FabricProcessor
 import com.thinkslynk.fabric.annotations.extensions.*
-import com.thinkslynk.fabric.annotations.find.registry.ItemGroupFinder
+import com.thinkslynk.fabric.annotations.processor.find.registry.ItemGroupFinder
 import com.thinkslynk.fabric.annotations.generate.Generator
 import java.nio.file.Path
 import javax.annotation.processing.ProcessingEnvironment
@@ -19,7 +19,7 @@ class RegisterItemGroupGenerator: Generator {
     }
 
     override fun generate(folder: Path, processingEnv: ProcessingEnvironment) {
-        val elements = ItemGroupFinder.itemGroups
+        val elements = ItemGroupFinder.elements
         if (elements.isEmpty()) return
 
         // Output file

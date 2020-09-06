@@ -8,8 +8,8 @@ import com.thinkslynk.fabric.annotations.extensions.addImports
 import com.thinkslynk.fabric.annotations.extensions.addLateInitProperties
 import com.thinkslynk.fabric.annotations.extensions.addTypes
 import com.thinkslynk.fabric.annotations.extensions.camelToSnakeCase
-import com.thinkslynk.fabric.annotations.find.registry.BlockEntityFinder
 import com.thinkslynk.fabric.annotations.generate.Generator
+import com.thinkslynk.fabric.annotations.processor.find.blockEntityFinder
 import com.thinkslynk.fabric.annotations.registry.RegisterBlockEntity
 import java.nio.file.Path
 import javax.annotation.processing.ProcessingEnvironment
@@ -26,7 +26,7 @@ class RegisterBlockEntityGenerator: Generator {
     }
     
     override fun generate(folder: Path, processingEnv: ProcessingEnvironment) {
-        val elements = BlockEntityFinder.blockEntities
+        val elements = blockEntityFinder.elements
         if (elements.isEmpty()) return
 
         // Output file
@@ -93,5 +93,5 @@ class RegisterBlockEntityGenerator: Generator {
         return funcBuilder.build()
     }
 
-    override val finders get() = listOf(BlockEntityFinder)
+    override val finders get() = listOf(blockEntityFinder)
 }

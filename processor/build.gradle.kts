@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     java
     kotlin("jvm")
@@ -6,6 +8,7 @@ plugins {
 
 group = "org.thinkslynk.fabric_annotations"
 version = "1.0-SNAPSHOT"
+
 
 repositories {
     mavenCentral()
@@ -27,9 +30,15 @@ configure<JavaPluginConvention> {
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions{
+            jvmTarget = "1.8"
+            freeCompilerArgs = freeCompilerArgs + listOf("-Xopt-in=kotlin.ExperimentalStdlibApi","-Xopt-in=kotlin.contracts.ExperimentalContracts")
+        }
     }
     compileTestKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions{
+            jvmTarget = "1.8"
+            freeCompilerArgs = freeCompilerArgs + listOf("-Xopt-in=kotlin.ExperimentalStdlibApi","-Xopt-in=kotlin.contracts.ExperimentalContracts")
+        }
     }
 }

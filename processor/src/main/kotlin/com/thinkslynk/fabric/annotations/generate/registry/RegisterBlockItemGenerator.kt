@@ -4,15 +4,20 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ClassName.Companion.bestGuess
 import com.thinkslynk.fabric.annotations.FabricProcessor
 import com.thinkslynk.fabric.annotations.extensions.*
-import com.thinkslynk.fabric.annotations.find.registry.BlockItemFinder
-import com.thinkslynk.fabric.annotations.generate.Generator
+import com.thinkslynk.fabric.annotations.processor.definition.BlockItemDefinitionProcessor
+import com.thinkslynk.fabric.annotations.processor.find.blockItemFinder
 import com.thinkslynk.fabric.annotations.registry.RegisterBlockItem
 import com.thinkslynk.fabric.helpers.AnnotationHelpers
 import java.nio.file.Path
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
 
-class RegisterBlockItemGenerator: Generator {
+class RegisterBlockItemGenerator: AbstractRegistryGenerator(
+    CLASS_NAME,
+    FUNC_NAME,
+    "ITEM",
+    BlockItemDefinitionProcessor
+) {
     companion object {
         const val CLASS_NAME = "BlockItemRegistryGenerated"
         const val FUNC_NAME = "register"
@@ -22,8 +27,8 @@ class RegisterBlockItemGenerator: Generator {
         }
     }
 
-    override fun generate(folder: Path, processingEnv: ProcessingEnvironment) {
-        val elements = BlockItemFinder.blockItems
+    fun generate_old(folder: Path, processingEnv: ProcessingEnvironment) {
+        val elements = blockItemFinder.elements
         if (elements.isEmpty()) return
 
         // Output file
@@ -50,10 +55,10 @@ class RegisterBlockItemGenerator: Generator {
 
     private fun generateRegistryClass(elements: Collection<Element>, vararg functions: FunSpec): TypeSpec =
         TypeSpec.objectBuilder(CLASS_NAME)
-            .addInitializedProperties(elements, RegisterBlockGenerator.Companion::formatPropertyName, {
+            .addInitializedProperties(elements, ::formatPropertyName, {
                 element ->
                 val annotation = element.getAnnotation(RegisterBlockItem::class.java)
-                val prop = RegisterBlockGenerator.formatPropertyName(element.simpleName.toString())
+                val prop = formatPropertyName(element.simpleName.toString())
                 val group = if (AnnotationHelpers.ItemGroup.contains(annotation.itemGroup)) {
                     "ItemGroup.${annotation.itemGroup}"
                 } else {
@@ -84,6 +89,4 @@ class RegisterBlockItemGenerator: Generator {
 
         return funcBuilder.build()
     }
-
-    override val finders get() = listOf(BlockItemFinder)
 }

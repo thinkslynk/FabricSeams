@@ -10,6 +10,12 @@ fun String.camelToSnakeCase(): String {
     }.toLowerCase()
 }
 
+fun String.camelToUpperSnakeCase(): String {
+    return camelRegex.replace(this) {
+        "_${it.value}"
+    }.toUpperCase()
+}
+
 fun String.snakeToLowerCamelCase(): String {
     return snakeRegex.replace(this) {
         it.value.replace("_","")
