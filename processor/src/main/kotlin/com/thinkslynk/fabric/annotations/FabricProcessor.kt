@@ -1,6 +1,7 @@
 package com.thinkslynk.fabric.annotations
 
 import com.google.auto.service.AutoService
+import com.thinkslynk.fabric.annotations.extensions.error
 import com.thinkslynk.fabric.annotations.extensions.info
 import com.thinkslynk.fabric.annotations.extensions.log
 import com.thinkslynk.fabric.annotations.extensions.warn
@@ -64,44 +65,51 @@ open class FabricProcessor : AbstractProcessor() {
         }
     }
 
-    var hasRun = false
+    private var hasRun = false
 
     override fun process(annotations: MutableSet<out TypeElement>, roundEnv: RoundEnvironment): Boolean {
-        if(hasRun) {
-            processingEnv.messager.warn("Trying to process multiple times")
-            return false
+        try {
+            if (hasRun) {
+                processingEnv.messager.warn("Trying to process multiple times")
+                return false
+            }
+            hasRun = true
+            val generatedSourcesRoot: String = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME] ?: run {
+                processingEnv.messager.printMessage(
+                    Diagnostic.Kind.ERROR,
+                    "Can't find the target directory for generated Kotlin files."
+                )
+                return false
+            }
+
+            // Prep folder
+            val path = Path.of(generatedSourcesRoot)
+            Files.createDirectories(path)
+
+            // TODO Find root package of mod
+
+            // TODO Create our full registry that points to all other generated registries
+
+            // process finders
+            processingEnv.messager.log("processors activated: ${processors.joinToString()}")
+
+            for (processor in processors) {
+                processingEnv.messager.info("running: $processor")
+                processor.run(roundEnv, processingEnv)
+            }
+
+            // process generators
+            for (generator in generators) {
+                processingEnv.messager.info("running: $generator")
+                generator.generate(path, processingEnv)
+            }
+            return true
+        } catch(ex:Exception) {
+            processingEnv.messager.error("Exception while processing")
+            processingEnv.messager.error("msg: ${ex.message}")
+            processingEnv.messager.error("trace: ${ex.stackTrace.joinToString("\n")}")
+            throw ex
         }
-        hasRun = true
-        val generatedSourcesRoot: String = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME] ?: run {
-            processingEnv.messager.printMessage(
-                Diagnostic.Kind.ERROR,
-                "Can't find the target directory for generated Kotlin files."
-            )
-            return false
-        }
-
-        // Prep folder
-        val path = Path.of(generatedSourcesRoot)
-        Files.createDirectories(path)
-
-        // TODO Find root package of mod
-
-        // TODO Create our full registry that points to all other generated registries
-
-        // process finders
-        processingEnv.messager.log("processors activated: ${processors.joinToString()}")
-
-        for (processor in processors) {
-            processingEnv.messager.info("running: $processor")
-            processor.run(roundEnv, processingEnv)
-        }
-
-        // process generators
-        for (generator in generators) {
-            processingEnv.messager.info("running: $generator")
-            generator.generate(path, processingEnv)
-        }
-        return true
     }
 
     override fun getSupportedAnnotationTypes(): MutableSet<String> {

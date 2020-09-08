@@ -1,3 +1,4 @@
+@file:Suppress("unused")
 package com.thinkslynk.fabric.annotations.extensions
 
 val camelRegex = "(?<=[a-zA-Z])[A-Z]".toRegex()

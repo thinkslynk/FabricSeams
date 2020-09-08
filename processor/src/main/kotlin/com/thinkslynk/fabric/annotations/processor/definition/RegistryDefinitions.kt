@@ -1,9 +1,7 @@
 package com.thinkslynk.fabric.annotations.processor.definition
 
 import com.thinkslynk.fabric.annotations.processor.find.blockFinder
-import com.thinkslynk.fabric.annotations.processor.find.blockItemFinder
 import com.thinkslynk.fabric.annotations.processor.find.itemFinder
-import com.thinkslynk.fabric.annotations.registry.RegisterItem
 import javax.lang.model.element.TypeElement
 
 object BlockDefinitionProcessor:ParameterisedElementProcessor(blockFinder) {

@@ -3,16 +3,16 @@ package com.thinkslynk.fabric.annotations.processor.find.registry
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.asClassName
 import com.thinkslynk.fabric.annotations.extensions.error
+import com.thinkslynk.fabric.annotations.extensions.isDeclared
+import com.thinkslynk.fabric.annotations.extensions.isEnum
+import com.thinkslynk.fabric.annotations.extensions.isEnumConstant
 import com.thinkslynk.fabric.annotations.processor.find.AnnotationFinder
 import com.thinkslynk.fabric.annotations.registry.Category
 import com.thinkslynk.fabric.annotations.registry.RegisterArgument
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
-import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
-import javax.lang.model.type.DeclaredType
-import javax.lang.model.type.TypeKind
 import javax.tools.Diagnostic.Kind
 import kotlin.reflect.KClass
 
@@ -22,12 +22,12 @@ object ArgumentFinder : AnnotationFinder {
     private val elements: MutableMap<ClassName, List<Element>> = mutableMapOf()
 
     override fun accept(element: Element, processingEnv: ProcessingEnvironment): Boolean {
-        if (element.kind != ElementKind.ENUM) {
+        if (!element.isEnum()) {
             processingEnv.messager.printMessage(Kind.ERROR, "Not an enum", element)
             return false
         }
-        element as TypeElement
-        val constants = element.enclosedElements.filter { it.kind == ElementKind.ENUM_CONSTANT }
+
+        val constants = element.enclosedElements.filter { it.isEnumConstant() }
         elements[element.asClassName()] = constants.map { it }
         return true
     }
@@ -39,9 +39,8 @@ object ArgumentFinder : AnnotationFinder {
 
     private fun getClassName(element: VariableElement): ClassName? {
         val type = element.asType()
-        if (type.kind != TypeKind.DECLARED)
+        if (!type.isDeclared())
             return null
-        type as DeclaredType
         val typeElement = type.asElement()
         if (typeElement !is TypeElement)
             return null

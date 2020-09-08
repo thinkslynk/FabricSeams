@@ -5,7 +5,10 @@ import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.asClassName
 import com.thinkslynk.fabric.annotations.FabricProcessor
-import com.thinkslynk.fabric.annotations.extensions.*
+import com.thinkslynk.fabric.annotations.extensions.debug
+import com.thinkslynk.fabric.annotations.extensions.error
+import com.thinkslynk.fabric.annotations.extensions.isClass
+import com.thinkslynk.fabric.annotations.extensions.isDeclared
 import com.thinkslynk.fabric.annotations.generate.registry.RegisterBlockGenerator
 import com.thinkslynk.fabric.annotations.generate.registry.RegisterItemGroupGenerator
 import com.thinkslynk.fabric.annotations.processor.AutomaticElementProcessor
@@ -14,14 +17,7 @@ import com.thinkslynk.fabric.annotations.registry.RegisterBlockItem
 import com.thinkslynk.fabric.helpers.AnnotationHelpers
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
-import javax.lang.model.element.Element
-import javax.lang.model.element.ElementKind
 import javax.lang.model.element.TypeElement
-import javax.lang.model.type.DeclaredType
-import javax.lang.model.type.TypeKind
-import javax.lang.model.type.TypeMirror
-import kotlin.contracts.ExperimentalContracts
-import kotlin.contracts.contract
 
 
 private fun check(processingEnv: ProcessingEnvironment){
@@ -52,7 +48,8 @@ object BlockItemDefinitionProcessor : AutomaticElementProcessor<Definition>() {
                 val match = HACKY_REGEX.find(annotationString)
                 if(match == null){
                     processingEnv.messager.error("RegisterBlockItemFor can only be placed on named classes", it)
-                    error("RegisterBlockItemFor can only be placed on named classes")
+                    return@run // might cause cascading issues but meh
+                    // the other option is to return a random string to the lambda?
                 }
                 match.groups[1]!!.value
             }
@@ -65,7 +62,7 @@ object BlockItemDefinitionProcessor : AutomaticElementProcessor<Definition>() {
                 )
                 itemAnnotation!!.kClass.qualifiedName ?: run {
                     processingEnv.messager.error("RegisterBlockItemFor can only be placed on named classes", it)
-                    error("RegisterBlockItemFor can only be placed on named classes")
+                    return // consider something else?
                 }
             }
         }

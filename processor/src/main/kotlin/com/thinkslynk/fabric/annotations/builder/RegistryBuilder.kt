@@ -1,15 +1,10 @@
 package com.thinkslynk.fabric.annotations.builder
 
 import com.squareup.kotlinpoet.*
-import com.thinkslynk.fabric.annotations.extensions.camelToUpperSnakeCase
-import com.thinkslynk.fabric.annotations.extensions.crossFlatMap
 import com.thinkslynk.fabric.annotations.processor.definition.Definition
-import com.thinkslynk.fabric.annotations.processor.find.registry.ArgumentFinder
 import java.nio.file.Path
-import javax.lang.model.element.TypeElement
-import javax.lang.model.element.VariableElement
 
-class RegistryBuilder(packageName: String, className: String, val funcName: String, val registry: MemberName) {
+class RegistryBuilder(packageName: String, className: String, funcName: String, val registry: MemberName) {
     constructor(packageName: String, className: String, funcName: String, registry: String) : this(
         packageName,className,funcName, MemberName(registryClass,registry)
     )
@@ -64,7 +59,7 @@ class RegistryBuilder(packageName: String, className: String, val funcName: Stri
         val identifierClass = ClassName("net.minecraft.util", "Identifier")
         val registryClass = ClassName("net.minecraft.util.registry", "Registry")
 
-        val registryNameInjector = Regex("""\$(\d+)""")
+        private val registryNameInjector = Regex("""\$(\d+)""")
 
         fun generateRegistryName(name: String, genArgs: List<Pair<ClassName, String>>): String =
             registryNameInjector.replace(name) {

@@ -10,10 +10,10 @@ fun FileSpec.Builder.addImports(elements: Collection<Element>): FileSpec.Builder
     elements.forEach {
 
         var enclosing = it
-        while (enclosing.kind != ElementKind.PACKAGE) {
+        while (!enclosing.isPackage()) {
             enclosing = enclosing.enclosingElement
         }
-        val packageElement = enclosing as PackageElement
+        val packageElement = enclosing
 
         b = b.addImport(packageElement.toString(), it.simpleName.toString())
     }

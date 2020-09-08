@@ -1,3 +1,4 @@
+@file:Suppress("unused")
 package com.thinkslynk.fabric.annotations.extensions
 
 import com.thinkslynk.fabric.annotations.extensions.LogLevel.*
@@ -5,7 +6,7 @@ import javax.annotation.processing.Messager
 import javax.lang.model.element.Element
 import javax.tools.Diagnostic
 
-val LOG_LEVEL = LogLevel.INFO
+val LOG_LEVEL = INFO
 
 fun Messager.debug(s: String) = printMessage(kind(DEBUG), s)
 fun Messager.debug(s: String, element: Element) = printMessage(kind(DEBUG), s, element)

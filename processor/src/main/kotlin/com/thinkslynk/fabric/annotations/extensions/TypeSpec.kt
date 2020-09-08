@@ -2,37 +2,33 @@ package com.thinkslynk.fabric.annotations.extensions
 
 import com.squareup.kotlinpoet.*
 import javax.lang.model.element.Element
-import javax.lang.model.element.ElementKind
-import javax.lang.model.element.ExecutableElement
 
 fun TypeSpec.Builder.addDefaultProperties(
     elements: Collection<Element>,
     formatName: (name: String) -> String
 ): TypeSpec.Builder {
-    var b = this
-    elements.forEach {
+    elements.forEach {element->
 
-        val targetClassName = it.simpleName.toString()
+        val targetClassName = element.simpleName.toString()
         val propName = formatName(targetClassName)
-        if (it.kind == ElementKind.METHOD) {
-            val methodElement = it as ExecutableElement
-            val returnType = methodElement.returnType
+        if (element.isMethod()) {
+            val returnType = element.returnType
 
-            b = b.addProperty(
+            this.addProperty(
                     PropertySpec.builder(propName, returnType.asTypeName(), KModifier.PUBLIC)
                             .initializer("$targetClassName()")
                             .build()
             )
         } else {
-            b = b.addProperty(
-                    PropertySpec.builder(propName, it.asType().asTypeName(), KModifier.PUBLIC)
+            this.addProperty(
+                    PropertySpec.builder(propName, element.asType().asTypeName(), KModifier.PUBLIC)
                             .initializer("$targetClassName()")
                             .build()
             )
         }
     }
 
-    return b
+    return this
 }
 
 fun TypeSpec.Builder.addInitializedProperties(

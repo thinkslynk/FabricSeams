@@ -11,7 +11,7 @@ abstract class AutomaticElementProcessor<T>: SimpleElementProcessor<T> {
         return Delegate(this)
     }
 
-    class Delegate<S>(val sep: SimpleElementProcessor<S>){
+    class Delegate<S>(private val sep: SimpleElementProcessor<S>){
         operator fun getValue(thisRef:Any, property: KProperty<*>) = sep.elements
     }
 }
