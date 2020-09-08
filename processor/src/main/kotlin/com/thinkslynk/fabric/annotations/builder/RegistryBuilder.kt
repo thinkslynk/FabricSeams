@@ -28,29 +28,21 @@ class RegistryBuilder(packageName: String, className: String, funcName: String, 
     }
 
     fun addDefinition(element: Definition) {
-        val name = element.name
-        val className = element.type
         objectBuilder
             .addProperty(
-                PropertySpec.builder(name, className)
-                    .addModifiers(KModifier.LATEINIT)
-                    .mutable(true)
-                    .setter(
-                        FunSpec.setterBuilder()
-                            .addModifiers(KModifier.PRIVATE)
-                            .build()
-                    )
+                PropertySpec.builder(element.name, element.type)
+                    .initializer(element.initializer)
                     .build()
             )
         registerBuilder
-            .addStatement("""$name = %L""", element.initializer)
             .addStatement(
-                """%T.register(%M, %T(%S, %P), $name)""",
+                """%T.register(%M, %T(%S, %P), %L)""",
                 registryClass,
                 registry,
                 identifierClass,
                 element.registryNamespace,
-                element.registryName
+                element.registryName,
+                element.name
             )
     }
 
