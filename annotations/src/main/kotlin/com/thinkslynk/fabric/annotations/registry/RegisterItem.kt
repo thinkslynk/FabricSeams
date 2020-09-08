@@ -1,7 +1,7 @@
 package com.thinkslynk.fabric.annotations.registry
 
 @Retention(AnnotationRetention.SOURCE)
-@Target(AnnotationTarget.CLASS)
+@Target(AnnotationTarget.CLASS, AnnotationTarget.CONSTRUCTOR)
 @Repeatable
 annotation class RegisterItem(
         val namespace: String,

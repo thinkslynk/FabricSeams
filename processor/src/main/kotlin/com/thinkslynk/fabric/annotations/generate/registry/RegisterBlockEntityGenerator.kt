@@ -8,13 +8,14 @@ import com.thinkslynk.fabric.annotations.extensions.addImports
 import com.thinkslynk.fabric.annotations.extensions.addLateInitProperties
 import com.thinkslynk.fabric.annotations.extensions.addTypes
 import com.thinkslynk.fabric.annotations.extensions.camelToSnakeCase
-import com.thinkslynk.fabric.annotations.generate.IGenerator
+import com.thinkslynk.fabric.annotations.generate.Generator
+import com.thinkslynk.fabric.annotations.processor.find.blockEntityFinder
 import com.thinkslynk.fabric.annotations.registry.RegisterBlockEntity
-import java.io.File
+import java.nio.file.Path
+import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
-import kotlin.reflect.KClass
 
-class RegisterBlockEntityGenerator: IGenerator {
+class RegisterBlockEntityGenerator: Generator {
     companion object {
         const val CLASS_NAME = "BlockEntityRegistryGenerated"
         const val FUNC_NAME = "register"
@@ -24,7 +25,8 @@ class RegisterBlockEntityGenerator: IGenerator {
         }
     }
     
-    override fun generate(elements: Collection<Element>, folder: File) {
+    override fun generate(folder: Path, processingEnv: ProcessingEnvironment) {
+        val elements = blockEntityFinder.elements
         if (elements.isEmpty()) return
 
         // Output file
@@ -91,7 +93,5 @@ class RegisterBlockEntityGenerator: IGenerator {
         return funcBuilder.build()
     }
 
-    override fun getSupportedAnnotationClass(): KClass<out Annotation> {
-        return RegisterBlockEntity::class
-    }
+    override val finders get() = listOf(blockEntityFinder)
 }
